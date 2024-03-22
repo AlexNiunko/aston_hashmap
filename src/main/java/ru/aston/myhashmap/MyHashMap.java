@@ -1,6 +1,9 @@
 package ru.aston.myhashmap;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class MyHashMap<K,V> implements MyMap<K,V> {
     private static final int DEFAULT_CAPACITY = 16;
@@ -237,6 +240,28 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
         return this.size;
     }
 
+    @Override
+    public Set<MyMap.Entry<K, V>> entrySet() {
+        Node<K,V> []tab=this.table;
+        Set<MyMap.Entry<K,V>>entries=new HashSet<>();
+        if (size>0){
+            for (int i = 0; i < tab.length; i++) {
+                Node<K,V>node=tab[i];
+                if (node!=null && node.next==null){
+                    entries.add(node);
+                } else if (node!=null && node.next!=null) {
+                    entries.add(node);
+                    Node<K,V>temp=node.next;
+                    while (temp!=null){
+                        entries.add(temp);
+                        temp=temp.next;
+                    }
+                }
+            }
+        }
+        return entries;
+    }
+
     private final int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
@@ -291,5 +316,41 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
             }
         }
         return newTab;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MyHashMap)) return false;
+        MyHashMap<?, ?> myHashMap = (MyHashMap<?, ?>) o;
+        return threshold == myHashMap.threshold && Float.compare(myHashMap.loadFactor, loadFactor) == 0 && size == myHashMap.size && Arrays.equals(table, myHashMap.table);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(threshold, loadFactor, size);
+        result = 31 * result + Arrays.hashCode(table);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        Node<K,V> []tab=this.table;
+        final StringBuilder sb = new StringBuilder("MyHashMap{");
+        for (Node<K,V> node:tab) {
+            if (node!=null){
+                if (node.next==null){
+                    sb.append("[Key:"+node.key+" /Value: "+node.value+"],");
+                } else {
+                    sb.append("[Key:"+node.key+" /Value: "+node.value+"],");
+                    Node<K,V>temp=node.next;
+                    while (temp!=null){
+                        sb.append("[Key:"+temp.key+" /Value: "+temp.value+"],");
+                        temp=temp.next;
+                    }
+                }
+            }
+        }
+        return sb.toString();
     }
 }
