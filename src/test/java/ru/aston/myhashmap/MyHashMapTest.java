@@ -13,6 +13,7 @@ class MyHashMapTest {
     private static Set<String> keys;
     private static Random random;
     private static MyHashMap<String, Integer> myHashMap;
+    private static Set<Integer>values;
     private static int numberOfEntries;
     private static int bottomLimit;
     private static int upperLimit;
@@ -40,48 +41,60 @@ class MyHashMapTest {
         }
         return set;
     }
+    private Set<Integer>makeSetOfValues(Set<String>keys){
+        Set<Integer>set=new HashSet<>();
+        for (String item:keys) {
+            set.add(calculateValue(item));
+        }
+        return set;
+    }
 
     private int fillHashMap(MyHashMap<String, Integer> hashMap) {
         int count = 0;
         for (String line : keys) {
-            if (hashMap.put(line,calculateValue(line))==null){
+            if (hashMap.put(line, calculateValue(line)) == null) {
                 count++;
             }
         }
         return count;
     }
-    private int calculateValue(String line){
-        return line.length()*line.charAt(0);
+
+    private int calculateValue(String line) {
+        return line.length() * line.charAt(0);
+    }
+    private int calculateAnotherValue(String line) {
+        return line.length() +(int) line.charAt(0);
     }
 
 
-     @BeforeAll
-     static void init() {
+    @BeforeAll
+    static void init() {
         random = new Random();
         myHashMap = new MyHashMap<>();
-        numberOfEntries=10;
-        bottomLimit=3;
-        upperLimit=8;
+        numberOfEntries = 10;
+        bottomLimit = 3;
+        upperLimit = 8;
     }
 
     @BeforeEach
     void createFullHashMap() {
         keys = makeSetOfKeys(numberOfEntries, bottomLimit, upperLimit);
-        numberOfEntries=fillHashMap(myHashMap);
+        values=makeSetOfValues(keys);
+        numberOfEntries = fillHashMap(myHashMap);
     }
 
 
     @Test
     void getValueIfThisVaLueIsExist() {
-        int number=random.nextInt(keys.size());
-        String key= (String) keys.toArray()[number];
-        Integer value=calculateValue(key);
-        Assertions.assertEquals(value,myHashMap.get(key));
+        int number = random.nextInt(keys.size());
+        String key = (String) keys.toArray()[number];
+        Integer value = calculateValue(key);
+        Assertions.assertEquals(value, myHashMap.get(key));
     }
 
     @Test
     void getValueIfKeyIsNotExist() {
-        String key=generateRandomLine(random,upperLimit,upperLimit+bottomLimit);
+        String key = generateRandomLine(random, upperLimit, upperLimit + bottomLimit);
         Assertions.assertNull(myHashMap.get(key));
     }
 
@@ -89,33 +102,58 @@ class MyHashMapTest {
     @Test
     void clearAllMap() {
         myHashMap.clear();
-        Assertions.assertNotEquals(myHashMap.size(),numberOfEntries);
-        int number=random.nextInt(keys.size());
-        String key= (String) keys.toArray()[number];
+        Assertions.assertNotEquals(myHashMap.size(), numberOfEntries);
+        int number = random.nextInt(keys.size());
+        String key = (String) keys.toArray()[number];
         Assertions.assertNull(myHashMap.get(key));
     }
 
     @Test
     void size() {
-        int size= myHashMap.size();
-        Assertions.assertEquals(numberOfEntries,size);
+        int size = myHashMap.size();
+        Assertions.assertEquals(numberOfEntries, size);
     }
 
     @Test
     void entrySetIfAllAreExist() {
-
+        Set<String>actualKeys=new HashSet<>();
+        Set<Integer>actualValues=new HashSet<>();
+        for (MyMap.Entry<String,Integer> item: myHashMap.entrySet()) {
+            actualKeys.add(item.getKey());
+            actualValues.add(item.getValue());
+        }
+        Assertions.assertAll(
+                ()->assertEquals(values,actualValues),
+                ()->assertEquals(keys,actualKeys)
+        );
     }
-
-
 
     @Test
-    void putIf() {
+    void putIfKeyIsExist() {
+        int number = random.nextInt(keys.size());
+        String key = (String) keys.toArray()[number];
+        int trueValue=calculateValue(key);
+        int anotherValue=calculateAnotherValue(key);
+        Assertions.assertAll(
+                ()->assertEquals(trueValue,myHashMap.put(key,anotherValue)),
+                ()->assertEquals(anotherValue,myHashMap.get(key))
+        );
     }
+
+    @Test
+    void putIfKeyIsNotExist() {
+        String key = generateRandomLine(random,upperLimit,upperLimit+bottomLimit);
+        int value=calculateValue(key);
+        Assertions.assertAll(
+                ()->assertNull(myHashMap.put(key,value)),
+                ()->assertEquals(value,myHashMap.get(key))
+        );
+    }
+
 
     @Test
     void remove() {
     }
-
 
 
     @Test
@@ -125,19 +163,16 @@ class MyHashMapTest {
     @Test
     void containsValue() {
     }
+
     @AfterEach
-    void destroyMap(){
+    void destroyMap() {
         myHashMap.clear();
         keys.clear();
     }
 
-
-
-
-
     @AfterAll
-    static void destroy(){
-        myHashMap=null;
-        keys=null;
+    static void destroy() {
+        myHashMap = null;
+        keys = null;
     }
 }
