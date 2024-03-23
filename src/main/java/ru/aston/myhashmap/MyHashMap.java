@@ -110,7 +110,6 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
             Node<K, V> first = tab[index];
             if (first != null) {
                 if (first.hash == hash && (inputKey != null && inputKey.equals(first.key))) {
-                    System.out.println(first.next.toString());
                     return first.value;
                 }
                 if (first.next != null) {
@@ -146,12 +145,14 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
                 }
                 Node<K, V> nodeInOldBucket = new Node<>(hash, key, value);
                 node.next = nodeInOldBucket;
+                this.size++;
+                return null;
             }
         } else {
             Node<K, V> nodeInNewBucket = new Node<>(hash, key, value);
             this.table[index] = nodeInNewBucket;
+            this.size++;
         }
-        this.size++;
         if (size > threshold) {
             this.table = increaseSize();
         }
@@ -199,6 +200,7 @@ public class MyHashMap<K,V> implements MyMap<K,V> {
                 tab[i] = null;
             }
         }
+        this.size=0;
     }
 
     @Override
