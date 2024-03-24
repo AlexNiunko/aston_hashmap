@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","u":"allclasses-index.html"},{"p":"ru.aston.myhashmap","l":"MyMap.Entry"},{"p":"ru.aston.myhashmap","l":"MyHashMap"},{"p":"ru.aston.myhashmap","l":"MyMap"}];updateSearchResults();
