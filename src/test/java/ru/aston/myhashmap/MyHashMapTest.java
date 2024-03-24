@@ -19,6 +19,7 @@ class MyHashMapTest {
     private static int upperLimit;
 
 
+
     private String generateRandomLine(Random random, int bottomLimit, int upperLimit) {
         int lineSize = bottomLimit + random.nextInt(upperLimit);
         int count = 0;
@@ -72,14 +73,14 @@ class MyHashMapTest {
     @BeforeAll
     static void init() {
         random = new Random();
-        myHashMap = new MyHashMap<>();
         numberOfEntries = 10;
         bottomLimit = 3;
-        upperLimit = 8;
+        upperLimit = 4;
     }
 
     @BeforeEach
     void createFullHashMap() {
+        myHashMap = new MyHashMap<>();
         keys = makeSetOfKeys(numberOfEntries, bottomLimit, upperLimit);
         values = makeSetOfValues(keys);
         numberOfEntries = fillHashMap(myHashMap);
@@ -163,6 +164,12 @@ class MyHashMapTest {
                 () -> assertNull(myHashMap.get(key))
         );
     }
+    @Test
+    void removeIfKeyIsNotExist() {
+        String key = generateRandomLine(random,upperLimit,bottomLimit+upperLimit);
+        Assertions.assertNull(myHashMap.remove(key));
+
+    }
 
 
     @Test
@@ -195,13 +202,107 @@ class MyHashMapTest {
 
     @AfterEach
     void destroyMap() {
-        myHashMap.clear();
-        keys.clear();
+        myHashMap=null;
+        keys=null;
+        values=null;
     }
 
     @AfterAll
     static void destroy() {
-        myHashMap = null;
-        keys = null;
     }
+    @Nested
+    class MyHashMapTestConstructorsWithIllegalParameters {
+        @Test
+        void createWithNegativeCapacity() {
+            Assertions.assertThrows(IllegalArgumentException.class, () -> new MyHashMap<String, Integer>(-5));
+        }
+        @Test
+        void createWithNegativeLoadFactor(){
+            Assertions.assertThrows(IllegalArgumentException.class, () -> new MyHashMap<String, Integer>(15,-0.6f));
+        }
+    }
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class MyHashMapTestWithSameKey{
+        @BeforeAll
+        void init(){
+            random=new Random();
+            bottomLimit=3;
+            upperLimit=4;
+            numberOfEntries=1;
+        }
+        @BeforeEach
+        void prepare(){
+            myHashMap=new MyHashMap<>(2);
+            keys=makeSetOfKeys(numberOfEntries,bottomLimit,upperLimit);
+            values=makeSetOfValues(keys);
+            numberOfEntries=fillHashMap(myHashMap);
+        }
+        @Test
+        void putWithSameIndex(){
+            int number = random.nextInt(keys.size());
+            String key = (String) keys.toArray()[number];
+            String newKey=key+" ";
+            int newValue=calculateValue(newKey);
+            Assertions.assertNull(myHashMap.put(newKey,newValue));
+        }
+        @Test
+        void calculateIndexIfTabSizeNegative(){
+            int number = random.nextInt(keys.size());
+            String key = (String) keys.toArray()[number];
+            int tabSize=-5;
+            Assertions.assertThrows(IllegalArgumentException.class,()->MyHashMap.calculateIndex(key,tabSize));
+        }
+        @Test
+        void getWithTheSameIndex(){
+            int number = random.nextInt(keys.size());
+            String key = (String) keys.toArray()[number];
+            String newKey=key+" ";
+            int value=calculateValue(newKey);
+            myHashMap.put(newKey,value);
+            Assertions.assertEquals(value,myHashMap.get(newKey));
+        }
+        @AfterEach
+        void destroyMap(){
+            myHashMap=null;
+            keys=null;
+            values=null;
+        }
+
+    }
+//    @Nested
+//    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+//    class MyHashMapTestCreationWithMaximumCapacity{
+//        @BeforeAll
+//        void init(){
+//            random=new Random();
+//            bottomLimit=1;
+//            upperLimit=9;
+//            numberOfEntries=MAXIMUM_CAPACITY;
+//        }
+//        @BeforeEach
+//        void createMap(){
+//            myHashMap=new MyHashMap<>(numberOfEntries);
+//            keys=makeSetOfKeys(100,bottomLimit,upperLimit);
+//            values=makeSetOfValues(keys);
+//        }
+//        @Test
+//        void putWithMaxCapacity(){
+//            String key = generateRandomLine(random, upperLimit, upperLimit + bottomLimit);
+//            int value=calculateValue(key);
+//            Assertions.assertNull(myHashMap.put(key,value));
+//        }
+//        @AfterEach
+//        void destroy(){
+//            myHashMap=null;
+//            keys=null;
+//            values=null;
+//        }
+//        @AfterAll
+//        void delete(){
+//            random=null;
+//        }
+//    }
+
+
 }

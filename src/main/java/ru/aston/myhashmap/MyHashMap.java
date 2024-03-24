@@ -82,14 +82,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             this.next = next;
         }
 
-        /**
-         * This is the constructor which creates our node using all fields except link to next node;
-         */
-        public Node(int hash, K key, V value) {
-            this.hash = hash;
-            this.key = key;
-            this.value = value;
-        }
 
         /**
          * This method returns the value of key;
@@ -119,19 +111,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             value = newValue;
             return oldValue;
         }
-
-
-        /**
-         * An overridden method compares two objects of a given class;
-         */
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Node<?, ?> node = (Node<?, ?>) o;
-            return Objects.equals(key, node.key) && Objects.equals(value, node.value);
-        }
-
         /**
          * An overridden method returns hashcode of an object of this class;
          */
@@ -140,16 +119,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return Objects.hash(key, value);
         }
 
-        /**
-         * The overridden method returns a string describing the object of this class.
-         */
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append("key=").append(key);
-            sb.append(", value=").append(value);
-            return sb.toString();
-        }
     }
 
     /**
@@ -269,13 +238,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
                 /*
                  *We put entry there
                  */
-                Node<K, V> nodeInOldBucket = new Node<>(hash, key, value);
+                Node<K, V> nodeInOldBucket = new Node<>(hash, key, value,null);
                 node.next = nodeInOldBucket;
                 this.size++;
                 return null;
             }
         } else {
-            Node<K, V> nodeInNewBucket = new Node<>(hash, key, value);
+            Node<K, V> nodeInNewBucket = new Node<>(hash, key, value,null);
             this.table[index] = nodeInNewBucket;
             this.size++;
         }
@@ -426,7 +395,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
      * @param key
      * @return int
      */
-    private final int hash(Object key) {
+    static final int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
@@ -437,7 +406,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
      * @param key
      * @return int
      */
-    private final int calculateIndex(Object key, int tabSize) {
+    static final int calculateIndex(Object key, int tabSize) {
         if (tabSize < 0) {
             throw new IllegalArgumentException("The negative table size " + tabSize);
         }
