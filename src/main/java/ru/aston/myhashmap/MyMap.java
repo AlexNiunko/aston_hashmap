@@ -1,6 +1,5 @@
 package ru.aston.myhashmap;
 
-import java.util.Map;
 import java.util.Set;
 
 public interface MyMap <K,V> {
